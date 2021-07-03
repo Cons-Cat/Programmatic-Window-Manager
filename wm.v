@@ -60,6 +60,11 @@ fn main_callback(cmd cli.Command) ? {
 		'kitty' {
 			Position{[screen, half_screen_width, 0, half_screen_width, screen_height]}
 		}
+		'nyxt' {
+			mut nyxt_x, _ := get_position('nyxt') or {foo()}
+			nyxt_x = if nyxt_x < half_screen_width { half_screen_width } else { 0 }
+			Position{[screen, nyxt_x, 0, half_screen_width, screen_height]}
+		}
 		else {
 			Position{[0, 0, 0, 600, 300]}
 		}
@@ -67,12 +72,29 @@ fn main_callback(cmd cli.Command) ? {
 	find_or_launch(input, pos)
 }
 
+// TODO: I can't figure out a way to out (0,0) in an `or` block.
+fn foo() (int,int){
+	return 0,0
+}
+
 fn find_or_launch(name string, pos Position) {
 	result := os.execute('jumpapp ' + name)
 	if result.exit_code == 0 {
 		os.execute('wmctrl -r :ACTIVE: -e $pos.build_mvargs()')
-		println(pos.build_mvargs())
 	} else {
 		panic('Failed to focus on $name!')
 	}
+}
+
+fn get_position(name string) ?(int, int) {
+	windows_list := os.execute('wmctrl -l -G -x').output.split('\n').filter(it.len > 0)
+	for line in windows_list{
+		// TODO: This is a terrible solution lol.
+		parsed_data := line.split(' ').filter(it != '')
+		if parsed_data[6].after('.').to_lower() == name {
+			println(parsed_data[6].after('.'))
+			return parsed_data[2].int(), parsed_data[3].int()
+		}
+	}
+	return none
 }
