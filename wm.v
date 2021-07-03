@@ -62,7 +62,7 @@ fn main_callback(cmd cli.Command) ? {
 		}
 		'nyxt' {
 			mut nyxt_x, _ := get_position('nyxt') or {foo()}
-			nyxt_x = if nyxt_x < half_screen_width { half_screen_width } else { 0 }
+			nyxt_x = if is_focused('nyxt') { if nyxt_x < half_screen_width { half_screen_width } else { 0 }} else { nyxt_x}
 			Position{[screen, nyxt_x, 0, half_screen_width, screen_height]}
 		}
 		else {
@@ -92,9 +92,17 @@ fn get_position(name string) ?(int, int) {
 		// TODO: This is a terrible solution lol.
 		parsed_data := line.split(' ').filter(it != '')
 		if parsed_data[6].after('.').to_lower() == name {
-			println(parsed_data[6].after('.'))
 			return parsed_data[2].int(), parsed_data[3].int()
 		}
 	}
 	return none
+}
+
+fn is_focused(name string) bool {
+	pid := os.execute('xdotool getwindowpid $(xdotool getactivewindow)').output
+	return pid == get_pid(name)
+}
+
+fn get_pid(name string)	string {
+	return os.execute('xdotool getwindowpid $(xdotool search --class $name)').output
 }
