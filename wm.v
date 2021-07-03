@@ -1,5 +1,6 @@
 module main
 
+import time
 import cli
 import os
 
@@ -65,6 +66,9 @@ fn main_callback(cmd cli.Command) ? {
 			nyxt_x = if is_focused('nyxt') { if nyxt_x < half_screen_width { half_screen_width } else { 0 }} else { nyxt_x}
 			Position{[screen, nyxt_x, 0, half_screen_width, screen_height]}
 		}
+		'emacs'{
+			Position{[screen,0,0,half_screen_width, screen_height]}
+		}
 		else {
 			Position{[0, 0, 0, 600, 300]}
 		}
@@ -78,12 +82,9 @@ fn foo() (int,int){
 }
 
 fn find_or_launch(name string, pos Position) {
-	result := os.execute('jumpapp ' + name)
-	if result.exit_code == 0 {
-		os.execute('wmctrl -r :ACTIVE: -e $pos.build_mvargs()')
-	} else {
-		panic('Failed to focus on $name!')
-	}
+	os.execute('jumpapp ' + name)
+	// time.wait(1_000_000_000)
+	os.execute('wmctrl -r :ACTIVE: -e $pos.build_mvargs()')
 }
 
 fn get_position(name string) ?(int, int) {
