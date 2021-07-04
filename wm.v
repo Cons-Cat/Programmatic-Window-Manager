@@ -66,16 +66,18 @@ fn main_callback(cmd cli.Command) ? {
 				half_screen_width, screen_height - border.states[4]]}
 		}
 		'nyxt' {
+			border := get_border('nyxt')
 			mut nyxt_x, _ := get_position('nyxt') or { foo() }
 			nyxt_x = if is_focused('nyxt') {
 				if nyxt_x < half_screen_width { half_screen_width } else { 0 }
 			} else {
-				nyxt_x
+				if nyxt_x < half_screen_width { 0 } else { half_screen_width }
 			}
-			Position{[screen, nyxt_x, 0, half_screen_width, screen_height]}
+			Position{[screen, nyxt_x, 0, half_screen_width, screen_height - border.states[4]]}
 		}
 		'emacs' {
-			Position{[screen, 0, 0, half_screen_width, screen_height]}
+			border := get_border('emacs')
+			Position{[screen, 0, 0, half_screen_width, screen_height - border.states[4] * 2]}
 		}
 		else {
 			Position{[0, 0, 0, 600, 300]}
