@@ -71,9 +71,11 @@ fn main_callback(cmd cli.Command) ? {
 			nyxt_x = if is_focused('nyxt') {
 				if nyxt_x < half_screen_width { half_screen_width } else { 0 }
 			} else {
-				if nyxt_x < half_screen_width { 0 } else { half_screen_width }
+				nyxt_x
 			}
-			Position{[screen, nyxt_x, 0, half_screen_width, screen_height - border.states[4]]}
+			Position{[screen, nyxt_x - border.states[3] * 2, border.states[4] * 0, half_screen_width,
+				screen_height - border.states[4],
+			]}
 		}
 		'emacs' {
 			border := get_border('emacs')
@@ -110,16 +112,16 @@ fn get_position(name string) ?(int, int) {
 }
 
 fn get_xwin_id(name string) string {
-	return os.execute('xdotool search --class $name').output.before('\n')
+	return os.execute('xdotool search --class $name').output
 }
 
 fn is_focused(name string) bool {
-	pid := os.execute('xdotool getwindowpid $(xdotool getactivewindow)').output.before('\n')
-	return pid == get_pid(name)
+	win_id := os.execute('xdotool getactivewindow').output
+	return win_id == get_xwin_id(name)
 }
 
 fn get_pid(name string) string {
-	return os.execute('xdotool getwindowpid $(${get_xwin_id(name)})').output
+	return os.execute('xdotool getwindowpid \$(${get_xwin_id(name)})').output
 }
 
 // TODO: Return multiple values instead?
