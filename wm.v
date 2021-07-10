@@ -65,14 +65,15 @@ fn main_callback(cmd cli.Command) ? {
 			Position{[screen, half_screen_width - border.states[3], border.states[4],
 				half_screen_width, screen_height - border.states[4]]}
 		}
-		'nyxt' {
-			border := get_border('nyxt')
-			mut nyxt_x, _ := get_position('nyxt') or { foo() }
-			nyxt_x = if is_focused('nyxt') {
+		'firefox' {
+			border := get_border('firefox')
+			mut nyxt_x, _ := get_position('firefox') or { foo() }
+			nyxt_x = if is_focused('firefox') {
 				if nyxt_x < half_screen_width { half_screen_width } else { 0 }
 			} else {
 				nyxt_x
 			}
+			nyxt_x = 20
 			Position{[screen, nyxt_x - border.states[3] * 2, border.states[4] * 0, half_screen_width,
 				screen_height - border.states[4],
 			]}
